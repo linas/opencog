@@ -57,11 +57,19 @@ SCM SchemeEval::do_apply_scm(const std::string& func, Handle& varargs )
 	return do_scm_eval(expr);
 }
 
+extern void tenter(void);
+extern void tleave(void);
+extern void reinit(void);
+extern bool doit;
 /**
  * Executes an ExecutionOutputLink
  */
 SCM SchemeSmob::ss_execute (SCM satom)
 {
+reinit();
+// tenter();
+if (doit) { doit = false; tleave(); }
+
 	AtomSpace* atomspace = ss_get_env_as("cog-execute");
     
 	Handle h = verify_handle(satom, "cog-execute");
@@ -72,7 +80,9 @@ SCM SchemeSmob::ss_execute (SCM satom)
 			"ExecutionOutputLink opencog cog-execute");
 	}
 
-	return handle_to_scm(ExecutionOutputLink::do_execute(atomspace, h));
+	SCM rc =  handle_to_scm(ExecutionOutputLink::do_execute(atomspace, h));
+// tleave();
+	return rc;
 }
 
 #endif

@@ -751,8 +751,14 @@ SCM SchemeEval::do_scm_eval(SCM sexpr)
  * returned. Otherwise, if the result of evaluation is a handle, that
  * handle is returned.
  */
+extern void tenter(void);
+extern void tleave(void);
+bool doit = false;
+
 Handle SchemeEval::eval_h(const std::string &expr)
 {
+tenter();
+doit = true;
 	// If we are recursing, then we already are in the guile
 	// environment, and don't need to do any additional setup.
 	// Just go.
@@ -773,6 +779,7 @@ Handle SchemeEval::eval_h(const std::string &expr)
 #ifdef WORK_AROUND_GUILE_THREADING_BUG
 	thread_unlock();
 #endif /* WORK_AROUND_GUILE_THREADING_BUG */
+// tleave();
 
 	return hargs;
 }
@@ -796,8 +803,15 @@ void * SchemeEval::c_wrap_eval_h(void * p)
  * This method *must* be called in guile mode, in order for garbage
  * collection, etc. to work correctly!
  */
+SCM
+c_eval_string (const char *expr)
+{
+return scm_eval_string(scm_from_utf8_string (expr));
+}
+
 SCM SchemeEval::do_scm_eval_str(const std::string &expr)
 {
+// if (doit) { doit = false; tleave(); }
 	per_thread_init();
 
 	// Set global atomspace variable in the execution environment.
@@ -806,7 +820,7 @@ SCM SchemeEval::do_scm_eval_str(const std::string &expr)
 	_caught_error = false;
 	set_captured_stack(SCM_BOOL_F);
 	SCM rc = scm_c_catch (SCM_BOOL_T,
-	                      (scm_t_catch_body) scm_c_eval_string,
+	                      (scm_t_catch_body) c_eval_string,
 	                      (void *) expr.c_str(),
 	                      SchemeEval::catch_handler_wrapper, this,
 	                      SchemeEval::preunwind_handler_wrapper, this);

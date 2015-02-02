@@ -96,8 +96,46 @@ Handle ExecutionOutputLink::do_execute(AtomSpace* as, const HandleSeq& sna)
 /// Expects "args" to be a ListLink
 /// Executes the GroundedSchemaNode, supplying the args as argument
 ///
+struct timeval enter;
+struct timeval leave;
+struct timeval tin;
+struct timeval tout;
+static bool is_init = false;
+static bool is_reinit = false;
+static int count = 0;
+
+void reinit(void) {
+if(not is_reinit) {
+is_init = false;
+is_reinit = true;
+}
+}
+
+void tenter(void) {
+if(not is_init) {
+is_init = true;
+timerclear(&tin);
+timerclear(&tout);
+gettimeofday(&leave, NULL);
+count = 0;
+}
+gettimeofday(&enter, NULL);
+struct timeval diff;
+timersub(&enter, &leave, &diff);
+timeradd(&tout, &diff, &tout);
+}
+
+void tleave(void) {
+gettimeofday(&leave, NULL);
+struct timeval diff;
+timersub(&leave, &enter, &diff);
+timeradd(&tin, &diff, &tin);
+}
+
 Handle ExecutionOutputLink::do_execute(AtomSpace* as, Handle gsn, Handle args)
 {
+// tenter();
+
     if (GROUNDED_SCHEMA_NODE != gsn->getType()) {
         throw RuntimeException(TRACE_INFO, "Expecting GroundedSchemaNode!");
     }
@@ -120,7 +158,21 @@ Handle ExecutionOutputLink::do_execute(AtomSpace* as, Handle gsn, Handle args)
         while (' ' == schema[pos]) pos++;
 
         SchemeEval* applier = get_evaluator(as);
-        return applier->apply(schema.substr(pos), args);
+        Handle h(applier->apply(schema.substr(pos), args));
+// tleave();
+count++;
+
+#define RPT 20000
+if (count%RPT == 0) {
+double din = 1000000.0* tin.tv_sec + tin.tv_usec;
+din /= RPT;
+double dout = 1000000.0* tout.tv_sec + tout.tv_usec;
+dout /= RPT;
+
+printf("duude inside time = %f usec/call\n", din);
+printf("duude outside time = %f usec/call\n", dout);
+}
+return h;
 #else
         throw RuntimeException(TRACE_INFO,
             "Cannot evaluate scheme GroundedSchemaNode!");
