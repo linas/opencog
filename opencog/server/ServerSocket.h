@@ -25,8 +25,8 @@
 #ifndef _OPENCOG_SERVER_SOCKET_H
 #define _OPENCOG_SERVER_SOCKET_H
 
+#include <thread>
 #include <boost/asio.hpp>
-#include <boost/thread/thread.hpp>
 
 using boost::asio::ip::tcp;
 
@@ -49,7 +49,7 @@ private:
 
     boost::asio::io_service& io_service;
     tcp::socket socket;
-    boost::thread connectionThread;
+    std::thread connectionThread;
     bool lineProtocol;
     bool closed;
 

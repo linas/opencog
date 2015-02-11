@@ -172,7 +172,7 @@ void ServerSocket::handle_connection(ServerSocket* ss)
 void ServerSocket::start()
 {
     logger().debug("ServerSocket::start()");
-    connectionThread = boost::thread(boost::bind(&handle_connection, this));
+    connectionThread = std::thread(&handle_connection, this);
 }
 
 bool ServerSocket::isClosed()
