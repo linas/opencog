@@ -52,7 +52,7 @@ void gargleblast(int tid, int reps)
 	{
 		int j = i+10;
 		char buf[1000];
-		sprintf(buf, "echo '(Evaluation (Predicate \"visible face\") (List (Number %d)))\n' | nc -q 1 localhost 17333", j);
+		sprintf(buf, "/bin/echo '(Evaluation (Predicate \"visible face\") (List (Number %d)))' | nc -q 1 localhost 17333", j);
 
 		std::string reso = cmd_exec(buf);
 
@@ -83,7 +83,7 @@ void gargleblast(int tid, int reps)
 
 		if (20 <= i)
 		{
-			sprintf(buf, "echo '(cog-delete (Evaluation (Predicate \"visible face\") (List (Number %d))))\n' | nc -q 1 localhost 17333", j-20);
+			sprintf(buf, "/bin/echo '(cog-delete (Evaluation (Predicate \"visible face\") (List (Number %d))))' | nc -q 1 localhost 17333", j-20);
 			std::string delo = cmd_exec(buf);
 
 #define CUR_DEL_SZ 178
@@ -257,7 +257,7 @@ public:
 		// The hexadecimal \x16 is ctrl-C.
 		// The interrupt should kill the sleep immediately.
 		// Elapsed time should be well under a second.
-		int rc = system("echo '(sleep 42)\n\x16' | nc localhost 17333");
+		int rc = system("/bin/echo -e '(sleep 42)\n\x16' | nc localhost 17333");
 		if (rc != 0) printf("Error: first call failed\n");
 		TS_ASSERT_EQUALS(rc, 0);
 
@@ -267,7 +267,7 @@ public:
 
 		start = time(0);
 		// The hexadecimal \x18 is ctrl-X aka "cancel"
-		rc = system("echo '(sleep 42)\n\x18' | nc localhost 17333");
+		rc = system("/bin/echo -e '(sleep 42)\n\x18' | nc localhost 17333");
 		if (rc != 0) printf("Error: first call failed\n");
 		TS_ASSERT_EQUALS(rc, 0);
 
@@ -277,7 +277,7 @@ public:
 
 		start = time(0);
 		// The hexadecimal \x1b is ctrl-[ aka "escape"
-		rc = system("echo '(sleep 42)\n\x1b' | nc localhost 17333");
+		rc = system("/bin/echo -e '(sleep 42)\n\x1b' | nc localhost 17333");
 		if (rc != 0) printf("Error: first call failed\n");
 		TS_ASSERT_EQUALS(rc, 0);
 
