@@ -19,6 +19,30 @@ SET(CYTHON_FLAGS "-2" "-f" "-I" "${ATOMSPACE_INCLUDE_DIR}/opencog/cython")
 # Use this as a guide:
 # https://github.com/OpenKinect/libfreenect/blob/master/wrappers/python/CMakeLists.txt
 
+##################### NLP Types ##################
+
+CYTHON_ADD_MODULE_PYX(nlp_type_constructors)
+
+list(APPEND ADDITIONAL_MAKE_CLEAN_FILES "nlp_type_constructors.cpp")
+
+# opencog.nlp_types Python bindings
+INCLUDE_DIRECTORIES(${CMAKE_BINARY_DIR})
+ADD_LIBRARY(nlp_types_constructors SHARED
+	nlp_type_constructors.cpp
+)
+
+TARGET_LINK_LIBRARIES(nlp_types_constructors
+	# nlp_types
+	${PYTHON_LIBRARIES}
+)
+
+SET_TARGET_PROPERTIES(nlp_types_constructors PROPERTIES
+	PREFIX ""
+	OUTPUT_NAME nlp_type_constructors)
+
+INSTALL (TARGETS nlp_types_constructors
+	DESTINATION "${PYTHON_DEST}")
+
 ##################### OpenPsi ##################
 
 IF (HAVE_OPENPSI)
