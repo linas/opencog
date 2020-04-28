@@ -616,7 +616,9 @@
 "
   Go through each of the goals, including the shared ones.
 "
-  (if (and (null? GOAL) (null? top-lv-goals))
+  (if (and
+         (or (not GOAL) (null? GOAL))
+         (or (not top-lv-goals) (null? top-lv-goals)))
       (begin
         (cog-logger-warn ghost-logger
           "Did you forget to link a goal to the rule?")

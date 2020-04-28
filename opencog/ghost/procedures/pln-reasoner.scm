@@ -150,7 +150,7 @@
   inferences are recorded as a value on TRAIL.
 "
     (let* ((inputs (pln-get-nlp-inputs (get-previous-said-sents time))))
-        (if (null? inputs)
+        (if (or (not inputs) (null? inputs))
           (error "Inference in requested without proper configuration")
         ; Why record the inputs? -> To be able to filter outputs based on
         ; similarities to the inputs.
