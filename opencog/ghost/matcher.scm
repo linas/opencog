@@ -5,10 +5,10 @@
 "
   Check if a rule is still within its refractory period or not.
 "
-  (or (null? (cog-value RULE ghost-time-last-executed))
+  (define last-time (cog-value RULE ghost-time-last-executed))
+  (or (not last-time) (null? last-time)
       (> (- (current-time-us)
-            (car (cog-value->list
-              (cog-value RULE ghost-time-last-executed))))
+            (car (cog-value->list last-time)))
          refractory-period)))
 
 (define (stimulate-next-rules RULE)
@@ -27,7 +27,7 @@
       (for-each
         (lambda (r) (cog-stimulate r (* default-stimulus reactive-rule-sti-boost)))
         (cog-value->list next-reactive-rule)))
-    (if (not (null? next-rejoinder))
+    (if (and next-rejoinder (not (null? next-rejoinder)))
       (for-each
         (lambda (r) (cog-stimulate r (* default-stimulus rejoinder-sti-boost)))
         (cog-value->list next-rejoinder)))
@@ -186,8 +186,9 @@
     (let ((rejoinder
             (fold
               (lambda (rej top-rej)
-                (if (and (not (null? (cog-value rej ghost-rej-seq-num)))
-                         (or (null? top-rej)
+                (define rejval (cog-value rej ghost-rej-seq-num))
+                (if (and rejval (not (null? rejval))
+                         (or (not top-rej) (null? top-rej)
                              (< (car (cog-value->list
                                        (cog-value rej ghost-rej-seq-num)))
                                 (car (cog-value->list
