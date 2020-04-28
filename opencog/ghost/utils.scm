@@ -280,12 +280,15 @@
 
   A Scheme list will be returned as a result.
 "
+  (if LV
   (append-map
     (lambda (x)
       (if (cog-atom? x)
         (list x)
         (flatten-linkval x)))
-    (cog-value->list LV)))
+    (cog-value->list LV))
+  '())
+)
 
 ; ----------
 (define (get-rejoinder-level TYPE)

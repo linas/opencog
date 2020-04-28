@@ -791,7 +791,7 @@
   (define (set-next-rule PRULE CRULE KEY)
     (define val (cog-value PRULE KEY))
     (cog-set-value! PRULE KEY
-      (if (null? val)
+      (if (or (not val) (null? val))
         (LinkValue CRULE)
         (apply LinkValue (append (cog-value->list val) (list CRULE))))))
 

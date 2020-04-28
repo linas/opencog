@@ -23,7 +23,7 @@
     ; Stimulate the next rules in the sequence and lower the STI of
     ; the current one
     ; Rejoinders will have a bigger boost than reactive rules by default
-    (if (not (null? next-reactive-rule))
+    (if (and next-reactive-rule (not (null? next-reactive-rule)))
       (for-each
         (lambda (r) (cog-stimulate r (* default-stimulus reactive-rule-sti-boost)))
         (cog-value->list next-reactive-rule)))
